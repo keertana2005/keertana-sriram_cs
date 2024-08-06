@@ -1,0 +1,47 @@
+pip install pandas seaborn matplotlib scipy
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+from scipy.stats import skew, kurtosis
+
+# Load the Iris dataset
+from sklearn.datasets import load_iris
+iris = load_iris()
+df = pd.DataFrame(data=iris.data, columns=iris.feature_names)
+
+# Display the first five rows
+print("First five rows of the dataset:")
+print(df.head())
+
+# Choose the attribute to analyze (e.g., 'sepal length (cm)')
+attribute = 'sepal length (cm)'
+
+# Histogram and KDE Plot
+plt.figure(figsize=(14, 6))
+
+# Histogram
+plt.subplot(1, 2, 1)
+sns.histplot(df[attribute], kde=False, bins=30)
+plt.title(f'Histogram of {attribute}')
+
+# KDE (Kernel Density Estimation) Plot
+plt.subplot(1, 2, 2)
+sns.kdeplot(df[attribute])
+plt.title(f'KDE of {attribute}')
+
+plt.tight_layout()
+plt.show()
+
+# Probability (Density) of the Selected Attribute
+print("\nDensity of the selected attribute (using KDE):")
+sns.kdeplot(df[attribute], bw_adjust=0.5)
+plt.title(f'KDE of {attribute}')
+plt.show()
+
+# Skewness and Kurtosis
+attr_data = df[attribute]
+attr_skewness = skew(attr_data)
+attr_kurtosis = kurtosis(attr_data)
+
+print(f"\nSkewness of {attribute}: {attr_skewness:.2f}")
+print(f"Kurtosis of {attribute}: {attr_kurtosis:.2f}")
