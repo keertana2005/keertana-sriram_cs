@@ -1,0 +1,45 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.datasets import load_iris
+from scipy.stats import norm
+
+# Load the Iris dataset
+iris_data = load_iris()
+iris_df = pd.DataFrame(data=iris_data.data, columns=iris_data.feature_names)
+iris_df['species'] = iris_data.target
+
+# Calculate basic statistics
+total_records = iris_df.shape[0]
+means = iris_df.mean()
+std_devs = iris_df.std()
+
+# Print total number of records, means, and standard deviations
+print(f"Total number of records: {total_records}\n")
+print("Means of all attributes:")
+print(means)
+print("\nStandard deviations of all attributes:")
+print(std_devs)
+
+# Plot histograms and normal distribution curves for each attribute
+plt.figure(figsize=(16, 12))
+num_features = len(iris_df.columns) - 1  # Excluding the 'species' column
+
+for i, column in enumerate(iris_df.columns[:-1]):
+    plt.subplot(2, 2, i + 1)
+    
+    # Plot histogram
+    sns.histplot(iris_df[column], kde=True, stat='density', linewidth=0)
+    
+    # Plot normal distribution curve
+    xmin, xmax = plt.xlim()
+    x = pd.Series(np.linspace(xmin, xmax, 100))
+    p = norm.pdf(x, means[column], std_devs[column])
+    plt.plot(x, p, 'k', linewidth=2)
+    
+    plt.title(f'Distribution of {column}')
+    plt.xlabel(column)
+    plt.ylabel('Density')
+
+plt.tight_layout()
+plt.show()
