@@ -1,0 +1,42 @@
+import numpy as np
+from scipy.optimize import minimize
+import matplotlib.pyplot as plt
+
+# Generate synthetic data
+x = np.linspace(-10, 30, 100)
+e = np.random.normal(0, 1, 100)  # random error term
+y = 10 + 4*x + e  # Linear relationship with noise
+
+# Define the likelihood function (sum of squared errors)
+def likelihood(params):
+    a, b, c = params
+    y_pred = a + b*x + c*x**2
+    return np.sum((y - y_pred)**2)
+
+# Initial guesses for parameters [a, b, c]
+init_params = [10, 4, 0]
+
+# Minimize the likelihood function
+res = minimize(likelihood, init_params, method="L-BFGS-B")
+
+# Print the optimization results
+print("message:", res.message)
+print("success:", res.success)
+print("status:", res.status)
+print("fun:", res.fun)
+print("x:", res.x)
+print("nit:", res.nit)
+print("jac:", res.jac)
+print("nfev:", res.nfev)
+print("njev:", res.njev)
+print("hess_inv:", res.hess_inv)
+
+# Plot the data and the fitted curve
+plt.figure(figsize=(10, 6))
+plt.plot(x, y, 'o', label='Data')
+plt.plot(x, res.x[0] + res.x[1]*x + res.x[2]*x**2, label='Fitted Curve', color='red')
+plt.xlabel('x')
+plt.ylabel('y')
+plt.title('Data and Fitted Polynomial Curve')
+plt.legend()
+plt.show()
