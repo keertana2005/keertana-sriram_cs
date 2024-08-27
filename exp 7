@@ -1,0 +1,35 @@
+import numpy as np
+from sklearn.datasets import load_wine
+from sklearn.preprocessing import StandardScaler
+import matplotlib.pyplot as plt
+import seaborn as sns
+data = load_wine()
+X = StandardScaler().fit_transform(data.data)
+y = data.target
+n_classes = len(np.unique(y))
+means = np.array([X[y == i].mean(axis=0) for i in range(n_classes)])
+overall_mean = X.mean(axis=0)
+S_B = sum(np.sum(y == i) * np.outer((mean - overall_mean), (mean - overall_mean))
+          for i, mean in enumerate(means))
+S_W = sum(np.cov(X[y == i].T, bias=True) for i in range(n_classes))
+eigenvalues, eigenvectors = np.linalg.eig(np.linalg.inv(S_W).dot(S_B))
+sorted_indices = np.argsort(eigenvalues)[::-1]
+eigenvectors = eigenvectors[:, sorted_indices]
+eigenvalues = eigenvalues[sorted_indices]
+variance_ratio = eigenvalues / eigenvalues.sum()
+print(f"Variance Ratio:\n{variance_ratio[:n_classes-1]}")
+W = eigenvectors[:, :n_classes - 1]
+X_lda = X.dot(W)
+plt.figure(figsize=(20, 10))
+palette = sns.color_palette("husl", n_classes)
+X_lda_scaled = X_lda * 2
+for i in range(n_classes):
+    plt.scatter(X_lda_scaled[y == i, 0], X_lda_scaled[y == i, 1], label=f'Class {i}', alpha=0.8, edgecolors='w', s=100, c=palette[i])
+    plt.xlabel('LD 1')
+plt.ylabel('LD 2')
+plt.title('LDA Scatter Plot')
+plt.legend()
+plt.grid(True)
+plt.xlim([X_lda_scaled[:, 0].min() - 1, X_lda_scaled[:, 0].max() + 1])
+plt.ylim([X_lda_scaled[:, 1].min() - 1, X_lda_scaled[:, 1].max() + 1])
+plt.show()
