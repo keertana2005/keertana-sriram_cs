@@ -1,0 +1,76 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.cluster import KMeans
+from sklearn.datasets import make_blobs
+from sklearn.preprocessing import StandardScaler
+
+# Generate sample data
+n_samples = 300
+n_features = 2
+n_clusters = 4
+
+X, _ = make_blobs(n_samples=n_samples, centers=n_clusters, cluster_std=0.60, random_state=0)
+
+# Create a DataFrame
+df = pd.DataFrame(X, columns=['Feature1', 'Feature2'])
+
+# 1. Original Data Plot
+plt.figure(figsize=(12, 8))
+plt.subplot(2, 2, 1)
+plt.scatter(df['Feature1'], df['Feature2'], s=30)
+plt.title('Original Data')
+plt.xlabel('Feature 1')
+plt.ylabel('Feature 2')
+plt.grid(True)
+
+# 2. Standardizing the Data
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(df)
+
+# Plotting Standardized Data
+plt.subplot(2, 2, 2)
+plt.scatter(X_scaled[:, 0], X_scaled[:, 1], s=30)
+plt.title('Standardized Data')
+plt.xlabel('Standardized Feature 1')
+plt.ylabel('Standardized Feature 2')
+plt.grid(True)
+
+# 3. Elbow Graph
+wcss = []
+for i in range(1, 11):
+    kmeans = KMeans(n_clusters=i)
+    kmeans.fit(X_scaled)
+    wcss.append(kmeans.inertia_)
+
+plt.subplot(2, 2, 3)
+plt.plot(range(1, 11), wcss, marker='o')
+plt.title('Elbow Method for Optimal Clusters')
+plt.xlabel('Number of Clusters')
+plt.ylabel('WCSS (Within-Cluster Sum of Squares)')
+plt.grid(True)
+
+# 4. Scatter Plot to show the Clustering
+optimal_clusters = 4  # You can adjust this based on the elbow graph
+kmeans = KMeans(n_clusters=optimal_clusters)
+kmeans.fit(X_scaled)
+df['Cluster'] = kmeans.labels_
+
+plt.subplot(2, 2, 4)
+for cluster in range(optimal_clusters):
+    plt.scatter(df[df['Cluster'] == cluster]['Feature1'], 
+                df[df['Cluster'] == cluster]['Feature2'], 
+                label=f'Cluster {cluster}')
+
+# Plot the centroids
+plt.scatter(kmeans.cluster_centers_[:, 0], kmeans.cluster_centers_[:, 1], 
+            s=300, c='red', label='Centroids', marker='X')
+
+plt.title('K-Means Clustering')
+plt.xlabel('Feature 1')
+plt.ylabel('Feature 2')
+plt.legend()
+plt.grid(True)
+
+plt.tight_layout()  # Adjust layout
+plt.show()
