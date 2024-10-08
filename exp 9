@@ -1,0 +1,29 @@
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Sample DataFrame
+data = {
+    'Category': ['A', 'B', 'C', 'D'],
+    'Value': [10, 20, 15, 30]
+}
+df = pd.DataFrame(data)
+
+# Bar Plot
+plt.figure(figsize=(12, 5))
+
+plt.subplot(1, 2, 1)  # 1 row, 2 columns, 1st subplot
+sns.barplot(x='Category', y='Value', data=df, palette='viridis')
+plt.title('Bar Plot of Value by Category')
+plt.xlabel('Category')
+plt.ylabel('Value')
+
+# H-Plot (Horizontal Bar Plot)
+plt.subplot(1, 2, 2)  # 1 row, 2 columns, 2nd subplot
+sns.barplot(x='Value', y='Category', data=df, palette='viridis')
+plt.title('H-Plot of Value by Category')
+plt.xlabel('Value')
+plt.ylabel('Category')
+
+plt.tight_layout()  # Adjusts subplot params for better layout
+plt.show()
